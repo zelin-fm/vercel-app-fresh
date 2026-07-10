@@ -195,7 +195,7 @@
           <div class="f-group"><span class="f-label">Bulan</span><select id="fBulan"></select></div>
           <div class="f-group"><span class="f-label">SPV</span><select id="fSpv"><option value="">Semua SPV</option></select></div>
           <div class="f-group"><span class="f-label">Level Skill</span><div class="chip-row" id="lvlChips"></div></div>
-          <div class="f-group"><span class="f-label">Status</span><select id="fStatus"><option value="">Semua Status</option></select></div>
+          <div class="f-group"><span class="f-label">Rekomendasi Insentif</span><select id="fInsentif"><option value="">Semua Rekomendasi</option></select></div>
           <div class="f-group search-wrap">
             <span class="f-label">Cari Nama</span>
             <div style="position:relative;">
@@ -238,7 +238,7 @@ const COLMAP = [
   ["REKOMENDASI INSENTIF","insentif"],
 ];
 let DATA = [];
-let state = { bulan:"", spv:"", levels:new Set([4,3,2,1,0]), status:"", search:"", sortKey:"levelEff", sortDir:"desc", page:1, pageSize:50 };
+let state = { bulan:"", spv:"", levels:new Set([4,3,2,1,0]), insentifFilter:"", search:"", sortKey:"levelEff", sortDir:"desc", page:1, pageSize:50 };
 
 function pct(v){
   if(v===null||v===undefined) return null;
@@ -340,8 +340,8 @@ function initFilterOptionsIfNeeded(){
     bulanSel.addEventListener('change', ()=>{ state.bulan=bulanSel.value; state.page=1; renderAll(); });
     const spvSel = document.getElementById('fSpv');
     spvSel.addEventListener('change', ()=>{ state.spv=spvSel.value; state.page=1; renderAll(); });
-    const statusSel = document.getElementById('fStatus');
-    statusSel.addEventListener('change', ()=>{ state.status=statusSel.value; state.page=1; renderAll(); });
+    const insentifSel = document.getElementById('fInsentif');
+    insentifSel.addEventListener('change', ()=>{ state.insentifFilter=insentifSel.value; state.page=1; renderAll(); });
     const lvlChipsEl = document.getElementById('lvlChips');
     [4,3,2,1,0].forEach(lv=>{
       const chip = document.createElement('div');
@@ -356,7 +356,7 @@ function initFilterOptionsIfNeeded(){
     document.getElementById('search').addEventListener('input', (e)=>{ state.search=e.target.value.trim().toUpperCase(); state.page=1; renderAll(); });
     document.getElementById('resetBtn').addEventListener('click', ()=>{
       state.spv=""; document.getElementById('fSpv').value="";
-      state.status=""; document.getElementById('fStatus').value="";
+      state.insentifFilter=""; document.getElementById('fInsentif').value="";
       state.search=""; document.getElementById('search').value="";
       state.levels = new Set([4,3,2,1,0]);
       document.querySelectorAll('#lvlChips .chip').forEach(c=>c.classList.add('on'));
@@ -372,11 +372,11 @@ function initFilterOptionsIfNeeded(){
   const spvSet = [...new Set(DATA.map(d=>d.spv).filter(Boolean))].sort();
   spvSel.innerHTML = '<option value="">Semua SPV</option>' + spvSet.map(s=>`<option value="${s}">${s}</option>`).join('');
   spvSel.value = spvNow;
-  const statusSel = document.getElementById('fStatus');
-  const statusNow = statusSel.value;
-  const statusSet = [...new Set(DATA.map(d=>d.status).filter(Boolean))].sort();
-  statusSel.innerHTML = '<option value="">Semua Status</option>' + statusSet.map(s=>`<option value="${s}">${s}</option>`).join('');
-  statusSel.value = statusNow;
+  const insentifSel = document.getElementById('fInsentif');
+  const insentifNow = insentifSel.value;
+  const insentifSet = [...new Set(DATA.map(d=>d.insentif).filter(Boolean))].sort();
+  insentifSel.innerHTML = '<option value="">Semua Rekomendasi</option>' + insentifSet.map(s=>`<option value="${s}">${s}</option>`).join('');
+  insentifSel.value = insentifNow;
 }
 
 const COLS = [
@@ -423,7 +423,7 @@ function getFiltered(){
   return DATA.filter(d=>{
     if(state.bulan && d.bulan!==state.bulan) return false;
     if(state.spv && d.spv!==state.spv) return false;
-    if(state.status && d.status!==state.status) return false;
+    if(state.insentifFilter && d.insentif!==state.insentifFilter) return false;
     if(!state.levels.has(d.level)) return false;
     if(state.search && !d.nama.toUpperCase().includes(state.search)) return false;
     return true;
