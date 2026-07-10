@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skill Matrix Intelligence — Insentif Cutting Kulit (Live)</title>
+<title>RAPORT SKILL ALL OPERATOR — SEWING FACTORY F (Live)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -136,10 +136,10 @@
 <div id="app">
   <div class="sidebar">
     <div class="brand">
-      <div class="brand-mark">SI</div>
+      <div class="brand-mark">RS</div>
       <div class="brand-txt">
-        <div class="n">SKILL-INSENTIF</div>
-        <div class="s">Cutting Kulit · Live dari Sheets</div>
+        <div class="n">RAPORT SKILL ALL OPERATOR</div>
+        <div class="s">SEWING FACTORY F · Live dari Sheets</div>
       </div>
     </div>
     <div class="nav-item active" data-page="ringkasan">
@@ -385,8 +385,8 @@ const COLS = [
   {key:'masaKerja', label:'Masa Kerja (Th)', type:'raw'}, {key:'style', label:'Style', type:'text'},
   {key:'proses', label:'Proses', type:'text'}, {key:'kapasitas', label:'Rata2 Kapasitas', type:'raw'},
   {key:'eff', label:'%Eff', type:'pct'}, {key:'level', label:'Level', type:'level'},
-  {key:'repair', label:'%Repair', type:'pct'}, {key:'status', label:'Status', type:'status'},
-  {key:'treatment', label:'Rekomendasi Treatment', type:'wrap'}, {key:'insentif', label:'Rekomendasi Insentif', type:'wrap'},
+  {key:'repair', label:'%Repair', type:'pct'}, {key:'insentif', label:'Rekomendasi Insentif', type:'insentifBadge'},
+  {key:'status', label:'Status', type:'status'}, {key:'treatment', label:'Rekomendasi Treatment', type:'wrap'},
 ];
 function buildHead(){
   const tr = document.getElementById('tblHead');
@@ -397,7 +397,7 @@ function buildHead(){
     if(state.sortKey===c.key) th.classList.add('sorted');
     th.addEventListener('click', ()=>{
       if(state.sortKey===c.key){ state.sortDir = state.sortDir==='asc'?'desc':'asc'; }
-      else { state.sortKey=c.key; state.sortDir = (c.type==='text'||c.type==='wrap')?'asc':'desc'; }
+      else { state.sortKey=c.key; state.sortDir = (c.type==='text'||c.type==='wrap'||c.type==='insentifBadge')?'asc':'desc'; }
       state.page=1; renderAll();
     });
     tr.appendChild(th);
@@ -409,6 +409,14 @@ function statusClass(s){
   if(u.includes('BAIK')) return 'st-baik';
   if(u.includes('BERMASALAH')) return 'st-bermasalah';
   if(u.includes('PERLU')) return 'st-perlu';
+  return 'st-cek';
+}
+function insentifClass(s){
+  const u = norm(s);
+  if(!u) return 'st-cek';
+  if(u.includes('TIDAK LAYAK') || u.includes('TURUN') || u.includes('TAHAN') || u.includes('BELUM LAYAK')) return 'st-bermasalah';
+  if(u.includes('LAYAK') || u.includes('NAIK') || u.includes('BERPOTENSI')) return 'st-baik';
+  if(u.includes('PERTAHANKAN') || u.includes('TETAP') || u.includes('MAINTAIN')) return 'st-perlu';
   return 'st-cek';
 }
 function getFiltered(){
@@ -462,6 +470,9 @@ function renderTable(){
           const span=document.createElement('span'); span.className='badge lvl-'+d.level; span.textContent=LEVEL_LABEL[d.level]; td.appendChild(span);
         } else if(c.type==='status'){
           const span=document.createElement('span'); span.className='st-badge '+statusClass(v); span.textContent=v||'—'; td.appendChild(span);
+        } else if(c.type==='insentifBadge'){
+          td.className='wrap';
+          const span=document.createElement('span'); span.className='st-badge '+insentifClass(v); span.textContent=v||'Belum ada rekomendasi'; td.appendChild(span);
         } else if(c.type==='wrap'){
           td.className='wrap'; td.textContent = v || '—';
         } else { td.textContent = v || '—'; }
